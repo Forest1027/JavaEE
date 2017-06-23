@@ -1,0 +1,374 @@
+01、MySQL数据库的概述
+	什么是mysql数据库？
+	什么是关系型数据库？
+1、	mysql是关系型数据库管理系统，属于oracle旗下产品。
+2、	关系型数据库存放的是实体之间的关系：
+ 
+02、MySQL的安装
+	在资料里面有安装图解，按照那个来就行了。
+	知道安装mysql数据库的几个注意点就行了：
+1、	字符集一定要设置成utf8：
+ 
+2、	一定要打钩添加到环境变量path中
+ 
+03、MySQL的数据库服务器的存储方式
+	理解数据库的存储方式：
+	 
+	一个数据库服务器中会存在很多数据库，一般一个应用就对应一个数据库；一个数据库中会有很多表，一般一个实体就对应一张表，比如：商品、订单、用户信息等；一张表里面会有很多条数据，一般一个实体对象就对应一条数据。
+	总结一句话：数据在数据库里面是用表来存的。
+04、SQL的概述
+	什么是sql？
+	sql有哪些分类？
+1、	sql称为结构化查询语言（Structured Query Language），是一种编程语言，用于存储数据、查询、更新和管理关系型数据库。
+2、	分为4类：
+a)	DDL：数据定义语言，用于操作数据库和表；【创建（create）、删除（drop）、修改：（alter）、查（select）数据库或者表】
+b)	DCL：数据控制语言，一般用来管理数据库权限；grant  if…
+c)	DML：数据操纵语言，一般用来操作表中的数据；【增（insert）、删（delete）、改（update）】
+d)	DQL：数据查询语言，一般用来查询表中的数据；select
+05、SQL操作数据库：对数据库进行CRUD的操作
+	学会使用SQLyog工具；
+	对数据库进行CRUD的操作分别使用什么关键字？
+	1、推荐大家使用工具类操作： 
+	第一次打开可能需要注册激活，那么大家key里面的内容对应复制就行了：
+	 
+	激活完成之后打开界面需要建立一个连接，让工具连接到mysql数据库：
+	   
+2、对数据库进行CRUD的操作使用
+-- 创建数据库
+-- 语法：create database 数据库名 [character set 字符集 collate 字符集校验规则];
+CREATE DATABASE db1;-- 创建一个数据库叫db1
+CREATE DATABASE db2 CHARACTER SET gbk;-- 创建一个字符集为gbk的数据库叫db2
+CREATE DATABASE db3 CHARACTER SET utf8 COLLATE utf8_bin;-- 创建一个字符集为utf-8，字符集校验为utf8_bin的数据库叫db3
+
+-- 查看数据库(查看所有数据库、查看数据库的创建信息)
+-- 语法：
+	-- 1、show databases;
+	-- 2、show create database 数据库名;
+SHOW DATABASES;-- 查看所有数据库
+SHOW CREATE DATABASE db2;-- 查看数据库db2的信息
+SHOW CREATE DATABASE db3;-- 查看数据库db3的信息
+
+-- 删除数据库
+-- 语法：drop database 数据库名;
+DROP DATABASE db1;-- 删除db1数据库
+SHOW DATABASES;
+
+-- 修改数据库的字符集
+-- 语法：alter database 数据库名 character set 字符集 [collate 字符集校验规则];
+ALTER DATABASE db2 CHARACTER SET utf8;-- 把db2数据库的字符集修改成utf8
+SHOW CREATE DATABASE db2;
+
+-- 其他数据库操作（切换正在使用的数据库、查看当前选择的数据库）
+-- 语法：
+	-- 1、use 数据库名;
+	-- 2、select database();括号必须要
+USE db2;-- 切换（使用）db2数据库
+SELECT DATABASE();-- 查看当前选择的数据库（也就是正在使用的数据库）
+06、SQL操作数据库中表：创建表之数据类型
+	掌握创建表的语法格式和关键字是什么？
+	掌握java中数据类型对应到mysql中的数据类型。
+1、	语法格式：
+
+create table 表名称(
+   字段名 字段类型 约束，
+   字段名 字段类型 约束，
+   字段名 字段类型 约束，
+   … …
+);	 
+
+2、	mysql中的数据类型：
+Java中的类型						MySQL中的类型
+byte/short/int/long 					tinyint/smallint/int/bigint
+float									float
+double								double
+boolean								bit
+char/String							char和varchar类型
+									char和varchar的区别：
+									* char代表是固定长度的字符或字符串。
+										* 定义类型char(8),向这个字段存入字符串hello，那么数据库使用三个空格将其补全。
+									* varchar代表的是可变长度的字符串。
+										* 定义类型varchar(8), 向这个字段存入字符串hello,那么存入到数据库的就是hello。
+Date								date/time/datetime/timestamp
+									datetime和timestamp区别
+									* datetime就是既有日期又有时间的日期类型，如果没有向这个字段中存值，数据库使用null存入到数据库中
+									* timestamp也是既有日期又有时间的日期类型，如果没有向这个字段中存值，数据库使用当前的系统时间存入到数据库中。
+File									BLOB/TEXT
+07、SQL操作数据库中表：创建表之约束及建表
+	约束有什么作用以及约束有哪些分类？
+	创建表需要注意什么？使用工具就不会出现这种情况
+	约束的作用：用来规范数据的完整性。
+	单表的约束分类：
+					主键约束：primary key
+					唯一性约束：unique
+					非空约束：not null
+	注意：一个表中的主键只有一个。
+	创建表需要注意：创建表之前要有数据库，并且通过” use 数据库名”来使用一个数据库，再在这个数据库里面创建表：
+	 
+08、SQL操作数据库中表：查看所有表和查看某个表结构
+	掌握语法结构，重点是关键字：show tables和desc 表名。
+查看所有表：show tables;
+查看某个表结构：desc 表名;	 
+	对应结果：
+	 	 
+09、SQL操作数据库中表：删除表
+	删除表和删除数据库和相似：drop table 表名；
+	 	 
+10、SQL操作数据库中表：修改表
+	总结一下修改表的sql语句有哪些特征？
+①	、修改表都是以 alter table表名 开头的。
+②	、添加列使用add，删除列使用drop，修改列的长度使用modify，改变列名使用change，
+  修改表名使用rename to，修改表的字符集 character set
+1、	添加列：alter table 表名 add 列名 字段类型(长度) [约束];
+ 	 
+2、	删除列：alter table 表名 drop 列名;
+ 	 
+3、	修改列名称：alter table 表名 change 旧列名 新列名 新列名的字段类型 [约束];
+ 	 
+4、改列的字段、字段长度、约束：alter table 表名 modify 列名 字段类型(长度) [约束];
+ 	 
+5、表名：rename table 旧表名 to 新表名   或者  alter table 旧表名 rename to 新表名
+ 	 
+6、表的字符集：alter table 表名 chatacter set 新字符集 [collate字符集校验规则]
+ 
+ 	 
+11、SQL操作数据库中表的记录：添加记录
+	增加一条记录的语法是什么，关键字是什么？
+	有哪些注意事项？
+1、	语法：关键字是：insert into
+①	、给某几列插入数据：insert into 表名(列1,列2,列3…) values(值1,值2,值3…);
+②	、给所有列插入数据：insert into 表名values(值1,值2,值3…);   有多少列就写多少个值
+③	、一次性插入多行数据: insert into 表名values(值1,值2,值3…), (值1,值2,值3…), (值1,值2,值3…)…;
+2、	注意事项：
+①	、值的类型要与数据库中列的类型一致。
+②	、值的顺序要与列的顺序保持一致。
+③	、插入值的长度不能超过列规定的长度。
+④	、对于字符串和时间的值，要使用引号括起来。
+3、	案例：
+ 
+结果如下：
+		 
+12、SQL操作数据库中表的记录：添加中文记录
+	产生乱码的原因是什么？
+	如何解决乱码问题，有什么弊端？
+1、	因为window操作系统是中文环境，cmd窗口的字符集是gbk编码，而我们的数据库系统中的client端编码是utf8,两个码表不统一，所以会产生乱码。
+查看数据库的字符集：show variables like ‘%character%’;
+2、	找到mysql的按照目录（C:\Program Files (x86)\MySQL\MySQL Server 5.5）----》打开my.ini文件----》找到client字符集，修改成gbk。
+ ，
+这样的弊端就是：我们以后通过程序向数据库中插入值，程序的工作空间必须是gbk，不方便，所以，配置文件中还是保持是utf8，使用SQLyog等工具向数据库中插入数据，不使用cmd窗口操作就行了。
+案例：
+			 
+	结果如下：
+			 
+13、SQL操作数据库中表的记录：修改记录
+	修改一条记录的语法是什么，关键字是什么？
+	有哪些注意事项？
+1、	语法：关键字update
+update 表名 set 列名1=值1,列名2=值2…[where条件];
+如果没有带条件，那么就是把这一列的值都修改了。
+2、	注意事项跟添加数据时一样的。
+案例1：
+ 
+ 
+案例2：
+ 
+ 
+案例3：
+ 
+ 
+14、SQL操作数据库中表的记录：删除记录
+	删除记录的语法是什么，关键字是什么？
+	有哪些注意事项？
+	两种删除表数据的方式有什么区别？
+1、	delete from 表名 [where 条件]
+2、	注意事项：
+①	、删除数据是删除一行数据
+②	、当不带条件时，表示删除表里面所有数据。
+3、	delete from 表名 和truncate table 表名 两种方式的区别：
+delete from 表名：是DML语句，一条一条的删除数据，事务可以作用在DML语句上。
+truncate table 表名：是DDL语句，先删除表，再创建一个跟之前表一样结构的新表，事务不能作用在DDL语句上。
+	案例1：根据条件删除一行数据
+	 
+	 
+	案例2：删除所有数据
+	 
+15、SQL操作数据库中表的记录：查询操作、基本查询
+	基本查询的语法结构是什么，关键字是什么？
+	查询支持算数运算和如何取别名？
+		select * from 表名----------------------------------------------->查询所有信息
+		select列1，列2…from 表名--------------------------------->查询某几列的信息
+1、	查询所有学生的考试信息
+ 
+ 
+2、	查询所有学生的姓名和英语成绩
+ 
+ 
+3、	查询英语成绩，要求不重复
+ 
+ 
+4、	查询所有成绩的总和
+ 
+ 
+5、	别名查询
+ 
+ 
+16、SQL操作数据库中表的记录：查询操作、条件查询
+	条件查询使用什么关键字？
+	模糊查询使用什么关键字，_和%有什么区别？
+	in和between..and有什么区别？
+	1、使用where关键字表示条件查询，里面可包含如下关键字：
+		>  ,  <  ,  >=  ,  =<  ,  <>  ,  =
+	2、模糊查询使用like关键字
+			like可以进行模糊查询,在like子句中可以使用_或者%作为占位符。_只能代表一个字符，而%可以代表任意个字符。
+		* like ‘李_’		：名字中必须是两个字，而且是姓李的。
+		* like ‘李%’		：名字中姓李的学生，李字后可以有1个或任意个字符。
+		* like ‘%四’		：名字中以四结尾的。
+		* like ‘%王%’	：只要名称中包含这个字就可以。
+3、	in和between.. and..有什么区别
+in：是在给定的几个值之间查询。
+between.. and：取介于两个值之间的数据，是在一个范围内查询。相当于where xxx>a and xxx<b；
+条件关联：and , or , not,可以连接多个条件
+	案例1：>  ,  <  ,  >=  ,  =<  ,  <>  ,  =
+		 
+		 
+	案例2：like模糊查询
+		 
+		 只能查到名字是两个字，且姓李的同学
+		 
+		 只要包含李字，都能查到。
+	案例3：in：在给定的范围内查询
+		 ‘
+		 
+	案例4：between..and..：取介于两个值之间的数据
+		 
+		 
+	案例5：条件关联：and , or , not可以连接多个条件
+		 
+		 
+		 
+		 
+17、SQL操作数据库中表的记录：查询操作、排序查询
+	排序查询的语法结构以及关键字是什么？
+		语法结构：select * from 表名 [where 条件] order by 列名 asc/desc，列名 asc/desc …
+	案例1：升序查询
+		 
+		 
+	案例2：
+		 
+		 
+	案例3：
+		 
+		 
+18、SQL操作数据库中表的记录：查询操作、聚合函数查询
+	常见的聚合函数有有哪些，分别有什么作用？
+	Ifnull函数的作用是什么？
+	sum(字段名); 查询某一列数据总和
+	案例1：查询所有学生英语成绩总和
+		 
+		 
+	案例2：获取所有学生的英语成绩总和和数学成绩总和
+		 
+		 
+	案例3：查询姓李的学生的英语成绩的总和
+		 
+		 
+	案例4：查询所有学生各科的总成绩
+		 
+		 
+		 
+		 
+		区别：SUM(english)+SUM(chinese)+SUM(math)：是先计算每一列之和再求总和；
+			   SUM(english+chinese+math)：是先计算每个人的english、chinese、math之和再求总和
+		如何某个人的成绩存在null，这两种方式求总和就不一样了（null和一个数做算数运算等于null），但是我们可以使用ifnull函数
+		 
+	count(字段名)，统计数量
+		案例1：获得学生的总数
+			   ===》 
+			 ===》 
+			注意：如果有null值，这不被计算。
+			 ===》 
+		案例2：获得姓李的学生的个数
+			 ===》 
+	max(字段名)，计算最大值
+		案例：获得数学成绩的最高分
+		 ===》 
+	min(字段名)，计算最小值
+		案例：获得语文成绩的最小值
+		 ===》 
+	avg(字段名)，计算平均值
+		案例：获取语文成绩的平均值
+		 ===》 
+19、SQL操作数据库中表的记录：查询操作、分组查询
+	分组查询的语法结构和关键字是什么？
+	如果使用带有聚合函数的条件过滤或者分组后过滤，该怎么做？
+	总结完整的查询语句的语法格式是什么？
+1、	分组查询的语法结构：group by 字段名
+准备数据：
+			create table orderitem(
+				id int primary key auto_increment,
+				product varchar(20),
+				price double
+);
+insert into orderitem values (null,'电视机',2999);
+insert into orderitem values (null,'电视机',2999);
+insert into orderitem values (null,'洗衣机',1000);
+insert into orderitem values (null,'洗衣机',1000);
+insert into orderitem values (null,'洗衣机',1000);
+insert into orderitem values (null,'冰箱',3999);
+insert into orderitem values (null,'冰箱',3999);
+insert into orderitem values (null,'空调',1999);
+		案例1：按商品名称统计，每类商品所购买的个数：
+		 ===》 
+		案例2：按商品名称统计，每类商品所花费的总金额：
+		 ===》 
+		案例3：按商品名称统计，统计每类商品花费的总金额在5000元以上的商品：
+	 
+		 
+		2、注意：where子句不能使用聚合函数，如果现在使用带有聚合函数的条件过滤或者分组后过滤，使用having关键字
+		案例4：按商品名称统计，统计每类商品花费的总金额在5000元以上的商品，并且按照总金额升序排序：
+		 
+		 
+2、	select … from 表名 where 条件 group by 字段名 having 条件 order by asc/desc；
+重点内容：
+1、对数据库的CRUD操作
+	创建数据库：CREATE DATABASE 数据库名;
+				CREATE DATABASE 数据库名 [CHARACTER SET utf8];
+	删除数据库：DROP DATABASE 数据库名;
+	修改数据库字符集:ALTER DATABASE 数据库名 新的字符集
+	查看所有数据库:SHOW DATABASES;
+	其他操作：①、使用数据:USE 数据库名; 查看当前使用的数据库:SELECT DATABASE()；
+2、对数据库中的表的CRUD操作
+	创建表：CREATE TABLE 表名(
+		id INT PRIMARY KEY AUTO_INCREMENT,
+		username VARCHAR(20),
+		PASSWORD VARCHAR(20)
+	);
+	删除表：DROP TABLE 表名;
+	查看所有表：SHOW TABLES;   查看表结构：DESC 表名;
+3、	对表中的数据进行CUD操作：
+a)	insert into 表名(列1，列2,…) values (值1，值2，…..)
+b)	insert into 表名 values(值1，值2，…..)；
+c)	insert into 表名 values(值1，值2，…..)，（值1，值2，…..）
+d)	update 表名 set 列1=值1,列2=值2…；
+e)	update 表名 set 列1=值1,列2=值2….where 条件；
+f)	delete from 表名;    delete from 表名 where 条件;
+g)	truncate table 表名；
+4、	查询表中的数据：
+a)	基本查询：关键字：select
+select * from 表名;
+select name,english from exam;
+select name,chinese+English+math from exam;
+select name,chinese+English+math sum from exam;
+b)	条件查询：关键字：where
+Select * from 表名 where 条件;
+			模糊查询：like关键字 select * from exam where name like “李%”  要掌握_和%占位符的区别；
+			in和between的区别：
+				select * from exam where english in (70,80,90)；只能查询到英语成绩等于70,80或者90的学生信息；
+				select * from exam where english between 70 and 90;能查询到英语成绩在70至90之间的学生信息；
+c)	排序查询：关键字：order by 列名 asc/desc
+Select * from exam where name like “李%” order by english desc;
+d)	聚合函数：
+sum（列名）、max(列名)、min(列名)、count(*)、avg(列名);
+e)	分组查询：
+关键字：group by 列名
+select sum(price) from orderitem group by product having sum(price) > 5000;
+	总结完成的查询语句：select * from 表名 where 条件 group by 列名 having 条件 order by 列名 asc/desc；
