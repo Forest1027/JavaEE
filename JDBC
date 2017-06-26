@@ -1,0 +1,319 @@
+1、	JDBC的概念：
+ 
+2、	驱动：连接两个硬件（应用）之间的桥梁，JDBC就是连接java语言和mysql数据库之间的桥梁。
+3、	JDBC的作用：
+ 
+02-	JDBC的入门
+	掌握JDBC的开发步骤：
+准备工作：导入驱动jar包。（★★★★★重点）
+	 一定要 add to Build Path
+1、	通过反射加载驱动。
+2、	获取连接对象：Connection
+3、	获取操作数据库的Statement对象并执行sql语句
+4、	遍历ResultSet结果集
+5、	释放资源
+代码实现：
+public static void main(String[] args) throws Exception {
+	//1、通过反射加载驱动
+	Class.forName("com.mysql.jdbc.Driver");
+	//2、获取连接：Connection
+	Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/javaweb_day07", "root", "123456");
+	//3、获取操作数据库的Statement对象并执行sql语句
+	Statement statement = conn.createStatement();
+	String sql="select * from user;";
+	ResultSet resultSet = statement.executeQuery(sql);
+	//4、遍历结果集
+	while (resultSet.next()) {
+		int id = resultSet.getInt(1);//id
+		String username = resultSet.getString("username");
+		String password = resultSet.getString("password");
+		String nickname = resultSet.getString("nickname");
+		int age = resultSet.getInt("age");
+		System.out.println(id+" "+username+" "+password+" "+nickname+" "+age);
+	}
+	//5、方法资源
+	resultSet.close();
+	statement.close();
+	conn.close();
+}
+
+03-	JDBC的API详解之DriverManager
+	DriverManager对象又什么作用？
+	注册驱动为什么使用Class.forName（”com.mysql.jdbc.Driver”）方式？
+	如何理解获取连接的url路径？
+1、	DriverManager对象又两个作用：①、注册驱动和②、获取连接；
+ 
+ 
+2、	使用DriverManager的registerDriver方法来注册驱动需要传入一个Driver对象，也就是说我们需要new Driver（）；通过Driver类我们可以发现有这样的一个静态代码块：
+ 
+所以：当我们使用DriverManager的registerDriver方法来注册驱动时就会出现重复注册驱动情况，所以在实际开发中使用Class.forName（” com.mysql.jdbc.Driver”）方式来注册驱动。
+3、	获取连接： 
+例如：Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/javaweb_day07", "root", "123456");
+url		：与数据库连接的路径。
+user		：与数据库连接的用户名。
+password：与数据库连接的密码。
+其中url路径格式：jdbc:mysql://localhost:3306/javaweb_day07 
+jdbc				：连接数据库的协议
+mysql				：jdbc的子协议
+localhost			：mysql数据库服务器的主机地址，如果是本机就可以使用localhost，如果不是本机就使用连接主机的ip地址。
+3306				：mysql数据库服务器的端口号
+javaweb_day07	：要使用的数据库名称
+	建议：即使mysql数据库服务器所在主机是本机也不要省略localhost:3306，养成习惯。
+04-	JDBC的API详解之Connection
+	Connection对象有哪些作用？
+有两个作用：①、创建执行sql语句的statement对象；②、管理事务
+作用一、创建执行sql语句的对象：
+		 
+		 
+		 
+作用二：管理事务
+	 				 
+		 
+05-	JDBC的API详解之Statement
+	Statement对象有哪些作用？
+有两个作用：①、执行sql语句；②、进行批处理
+作用一：执行sql语句
+		 
+ 
+ 
+作用二：进行批处理：就是把几条sql语句添加到Statement对象命令列表中，一次性执行多条sql语句。
+ 
+ 
+ 
+06-	JDBC的API详解之ResultSet
+	如何遍历结果集以及获取结果集里面的数据？
+结果集：就是用来封装查询结果的一个对象，只有select语句执行结果才有ResultSet对象。
+结果集的遍历和数据获取：
+		 
+	遍历的原理：
+		 
+07-	JDBC的资源释放
+	掌握释放资源的标准代码：一般把释放资源的代码放到finally里面去执行
+finally {
+			//5、方法资源
+			if (resultSet!=null) {
+				try {
+					resultSet.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				resultSet=null;
+			}
+			if (statement!=null) {
+				try {
+					statement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				statement=null;
+			}
+			if (conn!=null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+				conn=null;
+			}
+	}
+08-	JDBC的CRUD操作之保存操作
+	分析实现保存操作的基本思路：
+1、	注册驱动：Class.forName("com.mysql.jdbc.Driver");
+2、	获取连接：connection=DriverManager.getConnection("jdbc:mysql://localhost:3306/javaweb_day07", "root", "123456");
+3、	获取操作数据库的Statement对象并执行sql语句
+statement= connection.createStatement();
+int num=statement.executeUpdate("insert into user value(null,'eee','123','老周',18);");
+if (num>0) {
+	System.out.println("数据插入成功！！！");
+}
+4、	释放资源
+09-	JDBC的CRUD操作之修改操作
+	分析实现修改操作的基本思路：
+1注册驱动：Class.forName("com.mysql.jdbc.Driver");
+2获取连接：connection=DriverManager.getConnection("jdbc:mysql://localhost:3306/javaweb_day07", "root", "123456");
+3获取操作数据库的Statement对象并执行sql语句
+statement=connection.createStatement();
+int num=statement.executeUpdate("update user set password=123456,nickname='天王盖地虎' where id=5");
+if (num>0) {
+	System.out.println("修改数据成功！！！");
+}
+4释放资源
+10-	JDBC的CRUD操作之删除操作
+	分析实现删除操作的基本思路：
+1注册驱动：Class.forName("com.mysql.jdbc.Driver");
+2获取连接：connection=DriverManager.getConnection("jdbc:mysql://localhost:3306/javaweb_day07", "root", "123456");
+3获取操作数据库的Statement对象并执行sql语句
+statement=connection.createStatement();
+int num=statement.executeUpdate("delete from user where id=5");
+if (num>0) {
+	System.out.println("删除数据成功！！！");
+}
+4释放资源
+11-	JDBC的CRUD操作之查询操作
+	分析实现查询操作的基本思路：跟我们的入门案例里面的思路时一样的
+查询一条数据的结果集判断：
+	 
+或者：
+	 
+12-	JDBC的工具类的抽取
+	总结一下抽取的原则：把相同的操作抽到一个方法里，可以重复利用。
+关于JDBC我们可以抽取：加载驱动、获取连接、释放资源这三部分的代码。
+工具类代码：
+public class JDBCUtils {
+	public static String driver;
+	public static String url;;
+	public static String user;
+	public static String passwor;
+	static{
+		driver="com.mysql.jdbc.Driver";
+		url="jdbc:mysql://localhost:3306/javaweb_day07";
+		user="root";
+		passwor="123456";
+	}
+	/**
+	 * 加载驱动
+	 * @throws ClassNotFoundException 
+	 */
+	public static void loadDriver() throws ClassNotFoundException{
+		Class.forName(driver);
+	}
+	/**
+	 * 获取连接，可以在获取连接里面一并加载驱动
+	 * @throws ClassNotFoundException 
+	 * @throws SQLException 
+	 */
+	public static Connection getConnection() throws ClassNotFoundException, SQLException{
+		Connection connection=null;
+		//加载驱动
+		loadDriver();
+//		获取连接
+		connection = DriverManager.getConnection(url, user, passwor);
+		return connection;
+	}
+	/**
+	 * 释放资源
+	 */
+	public static void release(ResultSet resultSet,Statement statement,Connection connection){
+		//释放resultSet
+		if (resultSet!=null) {
+			try {
+				resultSet.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			resultSet=null;
+		}
+		//释放statement
+		if (statement!=null) {
+			try {
+				statement.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			statement=null;
+		}
+		//释放connection
+		if (connection!=null) {
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			connection=null;
+		}
+	}
+}
+测试工具类代码：代码就简洁多了。
+public static void main(String[] args) {
+		Connection connection=null;
+		Statement statement=null;
+		ResultSet resultSet=null;
+		try {
+			//1、获取连接
+			connection = JDBCUtils.getConnection();
+			//2、获取操作数据库的statement对象并执行sql语句
+			statement = connection.createStatement();
+			resultSet = statement.executeQuery("select * from user");
+			//3、遍历结果集
+			while (resultSet.next()) {
+				int id = resultSet.getInt("id");
+				String username = resultSet.getString("username");
+				String password=resultSet.getString("password");
+				String nickname=resultSet.getString("nickname");
+				int age = resultSet.getInt("age");
+				System.out.println(id+" "+username+" "+password+" "+nickname+" "+age);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}finally {
+			//4、释放资源
+			JDBCUtils.release(resultSet, statement, connection);
+		}
+}
+13-	JDBC的配置信息提取到配置文件
+	如何定义配置文件以及加载配置文件中的信息？
+定义配置文件：
+ 
+获取配置文件中的信息：
+ 
+14-	JDBC的SQL注入漏洞
+	什么是sql注入漏洞？
+在我们的网站中肯定会有登录的操作，用户之所以能登录成功，肯定是通过用户名和对应的密码去数据库中能找到对应的一条数据，假设某个人不清楚密码，只通过输入用户名就能从数据库中找到一条对应的数据，那么这就称为sql注入漏洞。
+	正常的基本登录流程代码：
+	 
+	sql注入代码演示：
+	 
+15-	JDBC的SQL注入漏洞分析及解决
+	sql注入漏洞的原因是什么？
+	如何解决sql注入的漏洞？
+1、	原因：主要是用户输入了sql中规定的关键字，导致我们的sql语句的判断条件发生了变化。
+使用Statement对象来执行一个sql语句是这样的：
+resultSet=statement.executeQuery("select * from user where username='"+username+"' and password='"+password+"';");
+	   我们把用户输入的内容放到上面的sql语句对应的变量处：
+		 
+		or前面的一部分判断成立就能查到结果。
+2、	解决sql注入的漏洞：使用PreparedStatement对象而不是Statement对象。
+PreparedStatement有一个预编译的过程，这个过程会固定sql语句的格式，对于变量要求是用？来占位，那么传递过来的数据即使包含了sql关键字也不会当做关键字来识别。
+ 
+16-	JDBC的CRUD操作之PreparedStatement的保存操作
+	分析实现保存操作的思路：
+1、	使用JDBCUtils工具类获取连接
+2、	获取PreparedStatement对象，预编译sql语句
+3、	设置要传递的参数
+4、	执行sql语句，获取结果
+5、	如果结果大于0，表示插入成功。
+6、	释放资源
+		 
+17-	JDBC的CRUD操作之PreparedStatement的修改操作
+	实现思路和保存操作一样，注意关键代码中的sql语句：
+ 
+18-	JDBC的CRUD操作之PreparedStatement的删除操作
+	实现思路和保存操作一样，注意关键代码中的sql语句：
+ 
+19-	JDBC的CRUD操作之PreparedStatement的查询操作
+	实现思路和保存操作一样，注意关键代码中的sql语句：
+ 
+20-	JDBC的批处理操作
+	什么是批处理？
+	尽量掌握使用 PreparedStatement对象执行品处理就行了。
+1、批处理的概念：就是把几条sql语句添加到Statement对象命令列表或者PreparedStatement对象命令列表中，一次性执行多条sql语句。
+核心代码如下：
+ 
+最后：别忘了在连接mysql数据库的url路径后面添加rewriteBatchedStatements=true参数
+ 
+21-	重点内容：
+准备工作：拷贝jdbc驱动jar包
+查询操作的思路：
+1、	通过反射注册驱动：Class.forName(com.mysql.jdbc.Driver);
+2、	创建连接：Connection conn=DriverManager.getConnection(“jdbc:mysql://localhost:3306/数据库名称”,”root”,”123456”);
+3、	通过连接获取执行sql语句的statement对象: Statemtnt statement=conn.createStatement();
+4、	执行sql语句：ResultSet resultSet=statement.executeQuery(sql);
+5、	遍历结果集；
+6、	释放资源；
+增、删、改操作的思路：
+1、	通过反射注册驱动：Class.forName(com.mysql.jdbc.Driver);
+2、	创建连接：Connection conn=DriverManager.getConnection(“jdbc:mysql://localhost:3306/数据库名称”,”root”,”123456”);
+3、	通过连接获取执行sql语句的statement对象: Statemtnt statement=conn.createStatement();
+4、	执行sql语句：int row=statement.executeUpdate();
+5、	释放资源；
+
