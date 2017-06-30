@@ -1,0 +1,169 @@
+01-	WEB的概述
+	目前的软件架构有哪些，各有什么优缺点？
+	Web开发中的资源有哪些？
+1、	软件架构分为C/S架构和B/S架构
+C/S架构：Client/Server，称为客户端服务器架构，这类软件需要安装一个客户端，比如：QQ、eclipse、11对战平台.。。。
+		主要优点：服务器压力小。
+		主要缺点：更新麻烦。
+B/S架构：Browser/Server，称为浏览器服务器架构，不需要安装客户端，通过浏览器直接访问使用，比如：4399小游戏
+		主要优点：更新简单，只需要服务器端更新了，通过浏览器就可以直接访问使用。
+		主要缺点：服务器压力大
+2、	Web资源分为静态资源和动态资源
+静态资源：页面数据都是固定的、死的。比如：html、css、javascript
+动态资源：页面的数据都是从服务器动态获取的。jsp、Servlet、asp、php、ajax
+02-	Tomcat的概述及安装
+	掌握如何启动Tomcat服务器？
+下载和安装就不介绍了，下载路径：http://tomcat.apache.org/ ，也可以直接到今天的资料里面解压Tomcat直接用。
+ 
+解压：apache-tomcat-7.0.76.zip文件，放到非中文目录下，找到bin目录下的startup.bat文件双击启动。如下：
+ 
+双击之后出现：
+ 
+验证Tomcat是否启动成功，在浏览器里面输入http://localhost:8080/出现如下界面就算启动成功。
+ 
+03-	Tomcat的安装注意事项
+	安装和启动Tomcat可能出现哪些问题，该如何解决？
+问题一：java的环境变量没有配置，启动时cmd窗口一闪而过。
+解决：Tomcat的启动依赖java环境，在启动Tomcat之前要确保电脑上安装了jdk，并且正确配置了JAVA_HOME环境变量。
+			 
+	问题二：启动Tomcat时可能由于端口号被占，cmd窗口也会一闪而过。
+	原因：可能是由于启动了多个Tomcat服务器或者其他程序占用了Tomcat的8080端口号导致Tomcat启动不了。
+	解决①、找到占用Tomcat端口号的进程，结束该进程。
+			通过cmd窗口查看应用程序的端口号：
+			 
+			找到占用的进程后，通过任务管理器根据pid找到该进程并结束掉
+			 
+	解决②、修改Tomcat端口号
+			进入tomcat/conf/server.xml，找到：
+			 
+修改8080为其他端口号，建议不要乱修改，因为你也不知道哪个端口号有没有被占用。
+	注意：启动Tomcat如果出现问题，我们可以在apache-tomcat-7.0.76\logs目录中查看日志信息。
+	例如：端口被占用的异常：
+	 
+04-	Tomcat的目录结构
+	Tomcat的启动和关闭文件在哪个目录，Tomcat的相关配置文件在哪个目录，如果要发布一个项目该放到哪个目录？
+ 
+05-	动态WEB资源的目录结构（了解）
+website
+	|------静态页面（HTML、CSS、JS、图片）
+	|------JSP页面
+	|------WEB-INF(如果是动态web网站，就必须要有)
+			|-----web.xml	（如果是动态web网站，就必须要有）
+			|-----classes	（可选的）
+			|-----lib		（可选的）
+06-	Tomcat的项目发布方式一（最常用）
+	使用Tomcat服务器发布web项目有几种方式？
+方式一：直接将项目复制到apache-tomcat-7.0.76\webapps目录下（最直接、简单）
+方式二：在apache-tomcat-7.0.76\conf\server.xml中配置虚拟路径
+方式三：在apache-tomcat-7.0.76\conf\Catalina\localhost中配置虚拟路径
+07-	Tomcat的项目发布方式二（不推荐）
+	什么是虚拟路径？
+	发布项目第二种方式的实现思路是什么？
+1、	虚拟路径：自己取一个任意的路径名称与真实路径进行绑定，我们通过这个名称就可以访问到真实路径下的web项目。
+2、	发布项目方式二实现思路：
+a)	创建web项目（不要放在中文目录下）
+b)	在apache-tomcat-7.0.76\conf\server.xml中配置虚拟路径：
+ 
+c)	访问web项目：http://localhost:8080/website/index.html
+08-	Tomcat的项目发布方式三
+	发布项目第三种方式的实现思路是什么？
+1、	创建web项目（不要放在中文目录下）
+2、	在apache-tomcat-7.0.76\conf\Catalina\localhost中配置虚拟路径：
+ 
+在zxy.xml文件里：
+ 
+3、	访问web项目：http://localhost:8080/zxy/index.html 
+09-Eclipse集成Tomcat
+	参考Eclipse集成Tomcat的word文档，多练习几遍就行了。
+	总结几个注意点:
+1、	掌握流程：添加服务---设置服务---创建动态web项目---发布项目
+2、	在设置服务时，点击open，一定要设置：
+ 
+3、	在创建项目时要选择2.5版本，默认是3.0版本，这个版本不会生成web.xml文件
+4、	发布项目还可以：
+ 
+在接下来弹出的窗口中点击finnish即可，这个时候服务器就会重启，项目也部署上去了。
+10-Tomcat虚拟主机的配置之网站访问的全过程
+	通过浏览器是如何去访问web网站的？
+ 
+11-Tomcat虚拟主机的配置之虚拟主机的配置（了解）
+	了解虚拟主机的配置的实现思路：
+1、	创建一个虚拟主机目录
+2、	在Tomcat的conf/server.xml文件中配置虚拟主机，仿照原有的再配置一个。
+ 
+3、	修改本地的host文件：C:\Windows\System32\drivers\etc\hosts 
+ 
+4、	启动服务器，访问项目：http://www.baidu.com:8080/website/baidu.htm 
+此时相当于访问http://172.16.0.158:8080/website/baidu.htm ；如果不加8080端口号，访问的就不是Tomcat服务器了，但是加了又露馅了，很尴尬，所以接下来就要把Tomcat的端口号给改成http协议默认的端口号80，这样端口号就可以默认不写了。
+5、	找到Tomcat的server.xml文件，把Tomcat的端口号给改成http协议默认的端口号（80端口号）
+6、	将路径中的website去掉：在server.xml中找到host标签，在host标签里面创建虚拟路径。
+ 
+7、	在conf/web.xm配置默认的首页
+ 
+12-HTTP协议的概述
+	什么是http协议？
+	http协议主要有什么特点？
+1、	http协议：规定了浏览器和服务器之间的数据传输的格式
+2、	主要特点：http协议是基于请求和响应来实现的，一个请求对应一个响应，必须现有请求后有响应。
+13-HTTP协议的抓包分析
+这里给大家介绍如何使用chrome浏览器抓包，不需要装插件，很方便，直接在请求之前按F12打开“开发者模式”。
+ 
+14-HTTP协议之请求部分（重点）
+	get请求和post请求的各有几个请求部分组成？
+	get请求和post请求的区别？
+	Referer请求头和User-Agent请求头有什么作用？
+ 
+15-HTTP协议之响应部分（重点）
+	响应分为几个部分，包含哪些信息？
+	常见的响应码有哪些，分别有什么含义？
+ 
+16-Servlet的概述
+	理解什么是Servlet？
+	如何创建一个Servlet？（熟悉）
+1、	Servlet：是运行在 Web 服务器中的小型 Java 程序。通常通过 HTTP协议接收客户端的请求，同时也会给客户端一个响应。
+ 
+2、	创建一个Servlet的思路：
+a)	创建一个类实现Servlet接口，重写接口里面的方法
+b)	配置我们定义的Servlet
+17-Servlet的入门
+	在Servlet中如何向页面输出信息？
+1、	创建一个类实现Servlet接口，重写接口里面的方法
+ 
+2、	在web.xml中配置我们的Servlet
+ 
+18-Servlet的执行流程
+	理解Servlet的执行流程，从而读懂配置文件中的内容。
+ 
+19-Servlet的实现关系
+	GenericServlet和HttpServlet有什么区别？
+	实际开发中，我们的java类继承什么Servlet，重写什么方法？
+1、	GenericServlet和HttpServlet的区别
+a)	GenericServlet和HttpServlet都实现了Servlet接口，但是HttpServlet是GenericServlet的子类
+b)	GenericServlet称为通用的Servlet，是一个与协议无关的Servlet；HttpServlet是一个跟Http协议相关的Servlet，专门用来处理Http协议请求和响应的Servlet。
+2、	在实际开发中，我们创建Servlet通常是继承HttpServlet，重写doGet（）和doPost（）方法，因为HttpServlet里面的Service（）方法内部通过获取不同请求方式来调用对应的doXXX（）方法，所以只需要重写doGet（）和doPost（）方法就行了。但是由于两个方法里面的业务逻辑都是一样的，所以这两个方法可以相互调用，只需要在一个方法里面写我们的业务逻辑代码。
+ 
+20-Eclipse中使用Servlet模板
+使用工具这里就不介绍了，参考视频老师的文档就好啦！！！
+重点内容总结：
+1、	掌握请求分为哪几个部分，get请求和post请求的区别？
+a)	如果是get请求，请求部分由2部分组成，分别是请求行和请求头；如果是post请求，请求部分由3部分组成，分别是请求行、请求头、请求体，
+b)	get请求和post请求的区别：①、get请求的请求参数是在地址栏的url后面，post请求参数是在请求体里面；②、get请求提交的数据大小有限，post请求没有限制，所以对于文件上传使用post请求。
+2、	掌握响应分为哪几个部分以及常见的响应码：
+响应分为3部分：响应行、响应头、响应体；
+常见的响应码：
+		200		：响应成功；
+		302		：请求重定向；
+		304		：使用了缓存页面；
+		404		：在服务器中资源不存在（找不到）；
+		500		：服务器端java代码错误；
+3、	掌握创建Servlet的步骤：①、创建一个java类实现Servlet接口，重新接口的所有方法，主要方法是service（）方法
+②、在web.xml中配置Servlet；
+<servlet>
+             <servlet-name>HelloServlet</servlet-name>
+             <servlet-class>com.itheima.servlet.HelloServlet</servlet-class>
+         </servlet>
+         <servlet-mapping>
+              <servlet-name>HelloServlet</servlet-name>
+              <url-pattern>/hello</url-pattern>
+   </servlet-mapping>
+4、	熟悉Servlet的执行流程：
