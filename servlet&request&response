@@ -1,0 +1,148 @@
+01-	Servlet的生命周期
+	Servlet的生命周期方法有哪些？
+	Servlet的生命周期方法分别什么时候被调用？
+ 
+注意：init（）和destroy（）方法只会被调用一次，service（）方法会被多次调用，只要有请求service（）方法就会被调用。
+代码实现：
+		 
+02-	Servlet的启动时加载
+	什么情况下需要设置启动服务器时加载Servlet？
+	如何设置Servlet的启动时加载？
+1、	当初始化一个Servlet的时间比较长的时候，第一个访问的用户需要等上一段时间，这样一来用户体验会非常差。所以我们可以在启动服务器的时候初始化Servlet，服务器启动完了，Servlet也就初始化完成了。
+2、	在web.xml中配置：
+ 
+03-	Servlet的访问路径的配置（熟悉）
+	访问路径分为哪几种？
+	对于同一个Servlet，访问路径的优先级是怎样的？
+1、	访问路径分为：全路径匹配、目录匹配、扩展名匹配，实际上目录匹配也属于全路径匹配。
+全路径匹配：以/开头，例如：/ServletLife、/abc/ ServletLife;（http://localhost:8080/web01/HelloServlet）
+目录匹配：以/开头，/*结尾；例如：/*、/aaa/*（访问的时候*代表任意字符）；（http://localhost:8080/web01/hello/bhj）	
+扩展名匹配：以*开头，.xxx结尾，例如：*.a、*.do、*.abc；（x是任意字符）（http://localhost:8080/web01/ckl.hello）
+像aaa.do是不合法的，因为.前面必须是*，不能是任意字符
+注意：不能同时使用/*开头，.xxx结尾的路径；例如： /*.do    但是：/aaa.do属于全路径匹配
+2、	全路径匹配>目录匹配>扩展名匹配，越精确优先级越高；
+04-	ServletConfig对象（了解）
+	ServletConfig对象的作用是什么？
+ServletConfig对象是用来获取Servlet的一些配置信息的，例如获取Servlet的名称，Servlet的初始化参数…
+ 
+注意：Servlet的配置信息都是在web.xml的Servlet标签里面配置的。
+ 
+获取配置的初始化参数名和参数值以及Servlet名称：
+ 
+05-	ServletContext对象之获取web项目信息
+	什么是ServletContext？
+	ServletContext对象有什么作用？
+1、	ServletContext对象又称为Servlet的上下文对象，保存了整个web项目的信息，通过这个上下文对象可以保存或者获取web项目的信息。
+一个web项目只有一个ServletContext对象，服务器会为每个项目创建一个ServletContext对象。
+2、	可以获取文件的MIME类型、全局参数、web项目工程名。
+如何配置全局参数：在根路径（web-app）下面使用<context-param>标签配置全局参数
+注意！！该标签不同于初始化参数的配置，初始化参数要配在servlet里面，而全局参数的位置是与servlet并列的
+ 
+获取文件的MIME类型、全局参数、web项目工程名代码演示：
+ 
+06-	ServletContext对象之读取web项目下文件（重点）
+	如何获取web项目下的文件资源？
+想要获取web项目下的文件资源，使用传统的IO流方式是不行的，因为传统的IO流采用的是相对jre环境，而我们的web项目最终要发布到Tomcat服务器上，环境不一样。所以要使用ServletContext对象来获取，ServletContext身上有三个跟路径相关的方法：
+	  
+	 
+	 
+07-	ServletContext对象之作为域对象存取数据（重点）
+	什么是域对象?
+	ServletContext如何进行存值、取值和移除值？
+1、	如果把一个数据存到某个对象身上，在多个地方又能通过这个对象取出来，那么这个对象存的值就有了一定的作用范围，这个对象也就称为域对象。ServletContext作为一个域对象，它的作用范围是整个web项目，因为服务器会为每个web项目创建一个ServletContext对象，只要这个web项目在服务器上没被移除或者服务器没有关闭，那么ServletContext域对象就存在，它身上的数据也就在。
+2、	存值、取值和移除值的方法：
+ 
+ 
+ 
+08-	Response对象的概述-HttpServletResponse
+	什么是Response？
+当用户通过浏览器去访问服务器之后，服务器会对浏览器做出一个回答（响应），这个响应里面包含了很多信息，这些信息会封装成到Response对象身上，这个对象也成为响应对象。
+	 
+09-	Response对象的API
+	setHeader（）方法和addHeader（）方法有什么区别？
+掌握几个常用的方法：
+1、	setHeader（）方法是设置一个key对应一个value的响应头信息，设置的头信息会替换原来的头信息；addHeader（）方法是设置一个key对应多个value的响应头信息，添加的头信息会追加到原来的头信息后面
+2、	HttpServletResponse对象常用的方法
+ 
+ 
+ 
+ 
+ 
+ 
+10-	Response对象的API的代码演示
+	让页面重定向有几种方式？
+重定向的2种方式：
+ 
+解决页面输出中文乱码和定时刷新页面：
+ 
+11-	Response对象页面定时跳转的扩展（了解）
+	如何实现倒计时的功能？
+主要是使用javascript里面的循环定时器来倒计时。
+ 
+12-	Response对象响应的中文乱码处理（重点）
+	如何处理字节流响应中文乱码问题？
+	字符流响应中文乱码的原因是什么以及如何解决？
+1、字节流响应中文方式向页面输出中文不一定乱码，因为当我们使用String对象的getBytes（）方法编码时	。一旦出现了乱码，我们只需要在调用getBytes（）方法时设置编码的字符集，同时告诉浏览器显示页面也使用相同的字符集即可。
+	 
+2、字符流是有缓冲区的， response设计默认的缓冲区编码是ISO-8859-1，这个字符集不支持中文的。所以一定会出现乱码问题，一旦出现乱码问题，我们只需要设置response字符流缓冲区的编码和设置浏览器默认打开时候采用的字符集一致即可
+	 
+	一般使用下面的方式：
+	 
+	对于字节流响应乱码问题也适用：
+	 
+	注意：
+1、	通过上面的总结：response.setContentType("text/html;charset=utf-8");可以说是万能的方法
+2、	设置响应乱码应该在向页面输出之前设置，否则无效。
+ 
+13-	Request对象的概述及API的介绍- HttpServletRequest
+	掌握获取请求参数的方法
+	掌握Request作为域对象存值、取值和移除值的方法
+1、	获取请求参数的方法：
+ 
+ 
+ 
+2、	Request域存值、取值、移除值的方法：
+ 
+ 
+ 
+14-	Request对象的API的代码演示
+	了解一些获取客户端信息的api。
+ 
+ 
+15-	Request对象接收表单请求参数（重点）
+表单代码：
+ 
+后台接收数据代码：
+ 
+16-	Request对象接收表单请求参数的中文乱码处理（重点）
+	post请求提交参数乱码的原因是什么，如何解决？
+	get请求提交参数乱码原因是什么，如何解决？
+1、	post请求提交的参数是在请求体中传递的，数据会存放在request字符缓冲区里面，而缓冲区默认编码是iso-8859-1编码，所以我们只需要设置缓冲区编码为utf-8即可。
+ 
+2、	get请求提交的参数是在地址栏中传递的额，浏览器会对数据进行一次编码，数据发送到服务器之后，服务器默认使用iso-8859-1进行解码，这样乱码就产生了。要知道我们程序是不应该改浏览器和服务器的字符集，所以，我们只能倒着编码和解码一次就可获得原来的字符。如下图所示：
+ 
+代码演示：
+ 
+注意：username=new String(username.getBytes("iso-8859-1"),"utf-8");同样适用于解决post请求乱码问题，万能的方式。
+17-	重点内容：
+1、获取Tomcat中资源的绝对路径：servletContext.getRealPath(“”);//得到的我当前项目在Tomcat中的绝对路径
+		servletContext.getRealPath(“/b.txt”);
+		servletContext.getRealPath(“/WEB-INF/c.txt”);
+servletContext.getRealPath(“/WEB-INF/classes/d.txt”);
+获取Tomcat中资源的字节输入流： servletContext. getResourceAsStream(“”);//路径和上面的一样
+2、ServletContext对象之作为域对象存取数据:
+a)	作用范围：作用于整个web项目；
+b)	创建和销毁的时间：服务器启动的时候会为每个web项目创建一个ServletContext对象，当服务器正常关闭或者项目被移除了之后销毁；
+c)	存值：setAttribute(name,value);取值：getAttribute(name);移除值：removeAttribute(name)
+3、	解决response响应乱码问题：
+a)	字符流：response.setContentType(“text/html;charset=utf-8”);
+b)	字节流：
+response.setContentType(“text/html;charset=utf-8”);//告诉浏览器使用utf-8加载页面
+response.getOutputStream(“中文”.getBytes(“utf-8”))；//重新编码
+4、	获取表单参数值：
+a)	String username=request.getParameter(name)；//获取一个name对应一个value值
+b)	String[] hobbies=request.getParameterValues(name)；//获取一个name对应多个value值
+c)	Map<String,String[]> params=request.getParameterMap();//获取所有的参数
+5、	掌握get请求和post请求解决乱码思路：
+a)	解决post请求乱码问题：request.setCharacterEncoding("utf-8");
+b)	解决get请求乱码问题：username=new String(username.getBytes("iso-8859-1"),"utf-8");
