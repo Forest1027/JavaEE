@@ -1,0 +1,159 @@
+01-	监听器的概述
+	什么是监听器？
+	理解监听器的相关术语？
+1、	监听器：本质肯定是一个java类，用来监听另一个类的方法、属性是否发生了变化，一旦发生了变化，监听器这个类的某个方法就会被调用。
+2、	监听器中的相关术语：（以：脚踹汽车发生报警为例。）
+a)	事件源：被监听的对象（汽车）
+b)	监听器：用来监听的对象（报警器）
+c)	事件和监听器绑定：在汽车上安装报警器
+d)	事件：被监听的对象方法或者属性发生了改变（脚踹了车）
+试一试：分析警察抓小偷、放哨等情景中的事件源、监听器、事件。
+02-	监听器的入门
+	总结实现监听器监听的思路：
+案例代码：
+ 
+实现思路：
+1、	创建事件源（被监听对象）
+2、	绑定事件源和监听器（设置监听），这个时候就知道监听器是什么类型了。
+3、	创建监听器对象
+4、	触发监听。（将窗口关闭）
+03-	Servlet中的监听器
+	Servlet中的监听器监听的事件源分别是什么？
+	对Servlet中监听器可以分为哪几类？
+1、	Servlet中的监听器主要监听的事件源是域对象：ServletContext、HttpServletRequest、HttpSession
+2、	Servlet中监听器的分类：
+a)	监听三个域对象的创建、销毁的监听器。（有三个域对象就对应有三个监听器）
+b)	监听三个域对象的存值、替换值、移除值的监听器。（三个）
+c)	监听HttpSession中javabean的状态改变（钝化、活化、绑定、解绑）的监听器。（两个）
+04-	ServletContextListener监听器的使用
+	使用ServletContextListener监听器监听ServletContext的创建和销毁的实现思路是怎样的？
+1、	创建监听器类实现ServletContextListener接口，重新接口的所有方法。
+ 
+2、	将事件源和监听器进行绑定。（在web.xml中配置监听器就行了）
+ 
+05-	HttpSessionListener监听器的使用
+	HttpSession对象在什么时候创建和销毁？
+	分别访问html、jsp、Servlet是否会创建HttpSession对象？
+1、	HttpSession对象的创建和销毁：
+a)	创建：在服务器端第一次调用getSession()方法是创建
+b)	销毁：①、非正常关闭服务器时销毁session（正常关闭服务器，session会被序列化到硬盘）；②、session过期；③、手动调用HttpSession的方法销毁session。
+2、	访问html：不会创建HttpSession对象；访问jsp：会创建HttpSession对象（HttpSession对象时jsp的内置对象，jsp在被翻译成Servlet时调用了getSession（）方法）；访问Servlet：默认不会创建HttpSession对象。
+06-	ServletRequestListener监听器的使用
+	ServletRequest对象在什么时候创建和销毁？
+ServletRequestListener作用是：监听ServletRequest对象的创建和销毁；
+ServletRequest创建时机：当客户端向服务器发送一次请求时创建
+ServletRequest销毁时机：服务器对客户端作出相应之后销毁。
+07-	统计当前在线人数的案例
+	我们的案例需求是什么，尝试着去分析该如何实现？
+	根据分析结果，说说实现步骤？
+1、	需求：当我们访问一个jsp页面的时候，显示当前正在线的用户数量。画图分析如下：
+ 
+2、	实现步骤：
+a)	创建一个ServletContextListener监听器监听ServletContext对象的创建；（初始化在线人数0）
+ 
+b)	创建一个HttpSessionListener监听器监听HttpSession对象的创建和销毁；
+ 
+c)	配置监听器（绑定事件源和监听器）
+ 
+08-	监听三个域对象的属性变更的监听器
+	监听三个域对象的属性变更的监听器的作用是什么？
+这三个监听器主要是用来监听我们域对象的存值、替换值、移除值过程的。
+以HttpSessionAttributeListener为例：
+ 
+09-	监听HttpSession中Java类状态改变的监听器
+	当我们的session域存对象存有几种状态？
+	如何创建这种类型的监听器？
+	如何配置session的序列化与反序列化？
+1、	当session域中存对象时，对象有四种状态：绑定到session中（存值），从session中解绑（移除值），随session序列化到磁盘中（钝化），随session对象从磁盘中恢复（活化）。
+2、	创建监听器代码示例：
+绑定与解绑的监听器：
+ 
+钝化与活化的监听器：
+ 
+注意：这两个监听器都不需要在web.xml中配置。
+3、	在项目的META-INF目录下配置session的序列化与反序列化
+Context标签可以配置在：
+tomcat/conf/context.xml: tomcat所有下虚拟主机和虚拟目录下的工程都会序列化session
+tomcat/conf/Catalina/localhost/context.xml:localhost虚拟主机下的所有项目会序列化session
+工程/META-INF/context.xml:当前工程才会序列化session。
+		在META-INF目录下创建context.xml内容如下
+<Context>
+<Manager className="org.apache.catalina.session.PersistentManager" maxIdleSwap="1">
+	<Store className="org.apache.catalina.session.FileStore" directory="itheima"/>
+</Manager>
+</Context>
+
+10-	Filter的概述
+	什么是过滤器，有什么作用？
+	过滤器过滤请求的原理是什么？
+1、Filter又称为过滤器，在web开发中很常用，主要是过滤客户端向服务器发送的请求。
+2、Filter过滤的原理：
+ 
+11-	Filter的入门
+	实现一个过滤器的拦截请求的思路是怎么的？
+【第一弹】：创建一个类，实现Filter接口；
+【第二弹】：在web.xml中配置Filter；（配置过滤器类的路径，配置过滤器拦截请求的路径）
+ 
+配置Filter和配置Servlet很相似：
+ 
+12-	FilterChain对象的概述
+	什么是FilterChain？它的执行原理是什么？
+FilterChain称为过滤器链，web应用中可以存在很多个Filter过滤器，多个Filter过滤器组合起来就是一个过滤器链，受同一个FilterChain管理。过滤链中的Filter过滤器拦截是有先后顺序的，这个顺序取决于Filter在web.xml中<filter-mapping>的位置决定。
+	 
+	web.xml中的配置：
+	 
+13-	Filter的生命周期（了解）
+	了解Filter三个方法的调用时间。
+init(FilterConfig filterConfig)：在Filter过滤器被创建的时候调用，当服务器开启的时候会创建Filter对象，每个Filter对象只创建一次，init（）方法也只调用一次。
+doFilter（）：每次接收到请求或者响应之后调用，参数有ServletRequest和ServletResponse对象。
+destroy()：当服务器关闭或者应用从服务器中移除的时候， Filter对象就会被销毁。
+14-	FilterConfig对象的概述（了解）
+	FilterConfig对象有什么作用？
+FilterConfig对象主要是用来获取Filter过滤器的配置信息，和ServletConfig对象很相似。
+ 
+15-	过滤器的相关配置
+	重点掌握<url-pattern>和<dispatcher>的取值、作用。
+【第一弹】：<url-pattern>用来配置Filter过滤哪些路径下的请求，路径取值和配置Servlet一样。
+				完全路径：以/开头；例如：/aaa   /bbb/ccc
+				目录匹配：以/开头，以*结尾；例如：/*  /aaa/*
+				扩展名匹配：以*开头，以.xxx结尾；例如：*.a   *.do   *.abc
+				注意：不能/*.xxx；例如：/*.do   /*.abc
+【第二弹】<dispatcher>用来配置是拦截什么类型的请求（直接访问、请求转发、请求包含、错误页面跳转），有如下取值：
+<dispatcher>REQUEST</dispatcher>//直接访问（浏览器访问服务器的请求）
+<dispatcher>FORWARD</dispatcher>//请求转发
+<dispatcher>INCLUDE</dispatcher>//请求包含(动态包含)
+<dispatcher>ERROR</dispatcher>//错误页面跳转
+
+16-	案例：权限验证过滤器一
+	我们的案例需求是什么，该如何限制用户直接访问登录成功的页面？
+【需求一】：有一个登录页面，当用户登录成功之后保存用户信息并跳转到登录成功的页面显示用户名。
+【需求二】：如果用户没有登录，不允许用户直接访问我们登录成功的页面（默认是可以的），
+大致的实现思路：
+1、	项目环境准备：创建工程、分包、拷贝jar、拷贝工具类、拷贝C3P0的配置文件
+2、	完成正常的登录成功的流程。
+3、	使用过滤器，统一拦截访问成功页面的请求。
+登录的逻辑代码：
+ 
+17-	案例：权限验证过滤器二
+	在权限的过滤器里面，我们要做哪些操作？
+在过滤器里面，我们要获取session域中用户的信息，如果能获取到，说明用户已经是登录状态，放行；如果获取不到，那么就把错误信息显示到登录页面。代码实现如下：
+ 
+18-	案例：通用的字符集编码过滤器的分析
+	我们的案例需求是什么？
+	增强一个类的方法有哪几种方式？
+1、	需求：不管是get请求还是post请求，只要我们调用request.getParameter(name)方法获取参数值，就不要产生乱码。
+2、	增强一个类中的方法有三种方式：
+a)	继承：
+条件：必须要能够控制被增强类的构造方法
+b)	装饰者模式：
+条件①：装饰者（增强的类）和被装饰者（被增强的类）都要实现同一个接口；
+条件②：装饰者要获得被装饰者的引用
+缺点：如果接口中的方法很多那么就要实现很多方法。
+c)	动态代理：
+同样也是基于接口实现的。
+19-	案例：通用的字符集编码过滤器的代码实现
+	简要说明通用的字符集编码过滤器实现思路？
+1、	创建一个类继承HttpServletRequestWrapper，这个类就是HttpServletRequest对象的增强类，从写getParameter（）方法。
+ 
+2、	创建过滤器，在过滤器的doFilter（）方法里面将普通的request对象增强，并传递下去。
+ 
